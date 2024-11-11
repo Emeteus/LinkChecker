@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <title>Результати перевірки посилань</title>
+    <style>
+        /* Основной стиль для таблицы и контейнера */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f9f9f9;
+            margin: 0;
+            padding: 20px;
+            color: #333;
+        }
+        h2, h3 {
+            color: #333;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: left;
+        }
+        th {
+            background-color: #007BFF;
+            color: white;
+            text-align: center;
+        }
+        td {
+            text-align: center;
+            background-color: #fff;
+        }
+        /* Стили для пинг-бара и его контейнера */
+        .ping-container {
+            width: 100%;
+            background-color: #ddd;
+            border-radius: 5px;
+            overflow: hidden;
+            height: 20px;
+            position: relative;
+        }
+        .ping-bar {
+            height: 100%;
+            background-color: #4CAF50;
+            text-align: center;
+            position: relative;
+            transition: width 0.3s ease;
+        }
+        .ping-value {
+            position: absolute;
+            width: 100%;
+            text-align: center;
+            color: black;
+            font-size: 16px;
+            top: 0;
+            font-weight: bold;
+            line-height: 20px;
+        }
+        .na-text {
+            background-color: red;
+            color: white;
+            height: 20px;
+            line-height: 20px;
+            text-align: center;
+        }
+        /* Кнопки с градиентом и анимацией при наведении */
+        .visit-button, .unavailable-text {
+            font-size: 14px;
+            color: white;
+            padding: 8px 15px;
+            text-decoration: none;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background 0.3s ease;
+            text-align: center;
+        }
+        .visit-button {
+            background: linear-gradient(to right, #007bff, #0056b3);
+        }
+        .visit-button:hover {
+            background: linear-gradient(to right, #0056b3, #003f8a);
+        }
+        .unavailable-text {
+            background-color: gray;
+            cursor: not-allowed;
+        }
+    </style>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        function updatePing() {
+            const links = [];
+            document.querySelectorAll('.link-url').forEach((element) => {
+                links.push(element.textContent.trim());
+            });
+
+            $.ajax({
+                url: "{% url 'update_ping' %}",
+                data: { 'links[]': links },
+                success: function(data) {
+                    data.ping_data.forEach(item => {
+                        const pingElement = document.getElementById(`ping-${item.url}`);
+                        if (pingElement) {
+                            const pingBar = pingElement.querySelector('.ping-bar');
+                            const pingValue = pingElement.querySelector('.ping-value');
+                            
+                            if (item.ping !== 'N/A') {
+                                pingValue.textContent = `${item.ping} ms`;
+                                pingBar.style.width = `${Math.min(item.ping / 10, 100)}%`;
+                            } else {
+                                pingValue.textContent = 'N/A';
+                                pingBar.style.width = '0%';
+                            }
+                        }
+                    });
+                }
+            });
+        }
+
+        function confirmVisit(url) {
+            if (confirm("Ви впевнені, що хочете перейти на цей сайт?")) {
+                window.open(url, '_blank');
+            }
+        }
+
+        setInterval(updatePing, 3000);
+    </script>
+</head>
+<body>
+<h2>Результати перевірки посилань</h2>
+
+<h3>Коректні посилання:</h3>
+<table>
+    <tr>
+        <th>Посилання</th>
+        <th>SSL сертифікат</th>
+        <th>Пінг</th>
+        <th>Дія</th>
+    </tr>
+    {% for link in correct_links %}
+    <tr>
+        <td class="link-url">{{ link.url }}</td>
+        <td>{{ link.ssl }}</td>
+        <td id="ping-{{ link.url }}">
+            <div class="ping-container">
+                {% if link.ping != "N/A" %}
+                    <div class="ping-bar" style="width: {{ link.ping|divisibleby:10 }}%;">
+                        <span class="ping-value">{{ link.ping }} ms</span>
+                    </div>
+                {% else %}
+                    <div class="na-text">N/A</div>
+                {% endif %}
+            </div>
+        </td>
+        <td>
+            <button class="visit-button" onclick="confirmVisit('{{ link.url }}')">Перейти</button>
+        </td>
+    </tr>
+    {% endfor %}
+</table>
+
+<h3>Некоректні посилання:</h3>
+<table>
+    <tr>
+        <th>Посилання</th>
+        <th>SSL сертифікат</th>
+        <th>Пінг</th>
+        <th>Дія</th>
+    </tr>
+    {% for link in incorrect_links %}
+    <tr>
+        <td class="link-url">{{ link.url }}</td>
+        <td>{{ link.ssl }}</td>
+        <td id="ping-{{ link.url }}">
+            <div class="ping-container">
+                {% if link.ping != "N/A" %}
+                    <div class="ping-bar" style="width: {{ link.ping|divisibleby:10 }}%;">
+                        <span class="ping-value">{{ link.ping }} ms</span>
+                    </div>
+                {% else %}
+                    <div class="na-text">N/A</div>
+                {% endif %}
+            </div>
+        </td>
+        <td>
+            <span class="unavailable-text">Сайт недоступний</span>
+        </td>
+    </tr>
+    {% endfor %}
+</table>
+
+</body>
+</html>

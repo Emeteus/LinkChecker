@@ -1,0 +1,221 @@
+@import url(https://fonts.googleapis.com/css?family=Roboto:100,100italic,300,300italic,regular,italic,500,500italic,700,700italic,900,900italic);
+
+body.hidden {
+    overflow: clip;
+}
+
+body {
+    overflow-x: hidden; /* Предотвращаем горизонтальную прокрутку */
+    overflow-y: auto; /* Включаем вертикальную прокрутку */
+}
+
+.header {
+    position: relative;
+    padding-top: 20px;
+    overflow-x: hidden; /* Убираем горизонтальную прокрутку в хедере */
+}
+
+.header .nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.header .logo {
+    font-size: 32px;
+    line-height: 42px;
+    text-transform: uppercase;
+    font-weight: 900;
+}
+
+.header .menu {
+    display: flex;
+    align-items: center;
+}
+
+.header .item {
+    position: relative;
+    font-size: 14px;
+    line-height: 16px;
+    padding-bottom: 5px;
+}
+
+.header .item a {
+    transition: 0.3s;
+}
+
+.header .item:not(:last-child) {
+    margin-right: 20px;
+}
+
+.header .item::after {
+    content: "";
+    background-color: #000;
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 0%;
+    height: 2px;
+    transition: 0.3s;
+}
+
+.header .item.active::after {
+    width: 50%;
+}
+
+.header .item:hover::after {
+    width: 50%;
+}
+
+.header .hamburger {
+    cursor: pointer;
+    z-index: 1000;
+    display: none; /* Скрываем гамбургер в десктопной версии */
+    overflow: hidden;
+    width: 32px;
+    height: 26px;
+    position: relative;
+    background: transparent;
+}
+
+.header .hamburger span {
+    position: relative;
+    display: block;
+    background-color: #000;
+    width: 20px;
+    height: 2px;
+    transition: 0.3s;
+    margin-left: auto;
+}
+
+.header .hamburger span:not(:last-child) {
+    margin-bottom: 6px;
+}
+
+.header .hamburger span:nth-child(even) {
+    width: 40px;
+}
+
+.header.mobile .menu {
+    transform: translateX(0);
+}
+
+.header.mobile .reveal1 {
+    transform: skewX(-10deg) translateX(0%);
+}
+
+.header.mobile .reveal2 {
+    opacity: 1;
+}
+
+.header.mobile .hamburger span {
+    display: block;
+    background-color: #fff;
+}
+
+.header.mobile .hamburger span:first-child {
+    right: 100%;
+}
+
+.header.mobile .hamburger span:nth-child(3) {
+    right: -100%;
+}
+
+.header.mobile .hamburger span:nth-child(2) {
+    transform: rotate(-135deg);
+    top: 2px;
+    width: 70%;
+}
+
+.header.mobile .hamburger span:nth-child(4) {
+    transform: rotate(135deg);
+    top: -13.5px;
+    width: 70%;
+}
+
+@media (max-width: 900px) {
+    /* Показываем гамбургер на мобильных устройствах */
+    .header .hamburger {
+        display: block;
+        overflow: clip;
+        width: 40px; /* Увеличиваем ширину гамбургера */
+        height: 30px; /* Увеличиваем высоту */
+    }
+
+    /* Стиль для текста внутри гамбургера */
+    .header .hamburger span {
+        background-color: #000; /* Чёрный цвет для текста */
+    }
+
+    .header .reveal2 {
+        background-color: rgba(0, 0, 0, 0.75);
+        position: fixed;
+        top: 0;
+        right: 0;
+        width: 100vw;
+        height: 100vh;
+        z-index: 900;
+        opacity: 0;
+        transition: 0.5s;
+    }
+
+    .header .reveal1 {
+        position: fixed;
+        top: 0;
+        bottom: 0;
+        right: 0;
+        width: 350px;
+        background: #000;
+        transform: skewX(-10deg) translateX(100%); /* Меню скрыто за пределами экрана */
+        transform-origin: bottom left;
+        will-change: transform;
+        transition: 0.5s cubic-bezier(0.19, 1, 0.22, 1);
+    }
+
+    .header .menu {
+        padding-right: 20px;
+        text-align: right;
+        position: absolute;
+        top: 0;
+        right: 0;
+        height: 100vh;
+        z-index: 999;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-direction: column;
+        transform: translateX(100%); /* Скрываем меню за пределами экрана */
+        will-change: transform;
+        transition: transform 0.7s cubic-bezier(0.19, 1, 0.22, 1);
+    }
+
+    .header .menu .item {
+        width: 100%;
+    }
+
+    .header .menu .item:not(:last-child) {
+        margin-right: 0;
+        margin-bottom: 25px;
+    }
+
+    .header .menu a {
+        font-size: 20px;
+        line-height: 26px;
+        position: relative;
+        padding-bottom: 5px;
+        font-size: 1.5em;
+        color: white !important;
+        font-weight: 500;
+        transform: translateX(100%); /* Меню сдвинуто за пределы */
+    }
+
+    .header .menu a::after {
+        display: none;
+    }
+}
+
+/* CSS для отображения меню, когда гамбургер активен */
+.header.mobile .menu {
+    transform: translateX(0); /* Показываем меню */
+}
