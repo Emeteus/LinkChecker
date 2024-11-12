@@ -1,10 +1,17 @@
+{% load static %}
 <!DOCTYPE html>
-<html lang="uk">
+<html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>Результати перевірки посилань</title>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>LinkChecker | Results</title>
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <link rel="stylesheet" href="{% static 'css/header.css' %}">
+    <link rel="stylesheet" href="{% static 'css/footer.css' %}">
+    <link rel="stylesheet" href="{% static 'css/add2.css' %}">
     <style>
-        /* Основной стиль для таблицы и контейнера */
         body {
             font-family: Arial, sans-serif;
             background-color: #f9f9f9;
@@ -12,30 +19,35 @@
             padding: 20px;
             color: #333;
         }
+
         h2, h3 {
             color: #333;
         }
+
         table {
             width: 100%;
             border-collapse: collapse;
             margin-top: 20px;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
         }
+
         th, td {
             border: 1px solid #ddd;
             padding: 12px;
             text-align: left;
         }
+
         th {
             background-color: #007BFF;
             color: white;
             text-align: center;
         }
+
         td {
             text-align: center;
             background-color: #fff;
         }
-        /* Стили для пинг-бара и его контейнера */
+
         .ping-container {
             width: 100%;
             background-color: #ddd;
@@ -44,6 +56,7 @@
             height: 20px;
             position: relative;
         }
+
         .ping-bar {
             height: 100%;
             background-color: #4CAF50;
@@ -51,6 +64,7 @@
             position: relative;
             transition: width 0.3s ease;
         }
+
         .ping-value {
             position: absolute;
             width: 100%;
@@ -61,6 +75,7 @@
             font-weight: bold;
             line-height: 20px;
         }
+
         .na-text {
             background-color: red;
             color: white;
@@ -68,6 +83,7 @@
             line-height: 20px;
             text-align: center;
         }
+
         /* Кнопки с градиентом и анимацией при наведении */
         .visit-button, .unavailable-text {
             font-size: 14px;
@@ -80,12 +96,15 @@
             transition: background 0.3s ease;
             text-align: center;
         }
+
         .visit-button {
             background: linear-gradient(to right, #007bff, #0056b3);
         }
+
         .visit-button:hover {
             background: linear-gradient(to right, #0056b3, #003f8a);
         }
+
         .unavailable-text {
             background-color: gray;
             cursor: not-allowed;
@@ -101,14 +120,14 @@
 
             $.ajax({
                 url: "{% url 'update_ping' %}",
-                data: { 'links[]': links },
-                success: function(data) {
+                data: {'links[]': links},
+                success: function (data) {
                     data.ping_data.forEach(item => {
                         const pingElement = document.getElementById(`ping-${item.url}`);
                         if (pingElement) {
                             const pingBar = pingElement.querySelector('.ping-bar');
                             const pingValue = pingElement.querySelector('.ping-value');
-                            
+
                             if (item.ping !== 'N/A') {
                                 pingValue.textContent = `${item.ping} ms`;
                                 pingBar.style.width = `${Math.min(item.ping / 10, 100)}%`;
@@ -131,68 +150,108 @@
         setInterval(updatePing, 3000);
     </script>
 </head>
-<body>
-<h2>Результати перевірки посилань</h2>
+<body class="body">
+<header class="header">
+    <div class="container">
+        <nav class="nav">
+            <a href="#" class="logo">
+                LinkCheker
+            </a>
+            <div class="reveal1"></div>
+            <div class="reveal2"></div>
 
-<h3>Коректні посилання:</h3>
-<table>
-    <tr>
-        <th>Посилання</th>
-        <th>SSL сертифікат</th>
-        <th>Пінг</th>
-        <th>Дія</th>
-    </tr>
-    {% for link in correct_links %}
-    <tr>
-        <td class="link-url">{{ link.url }}</td>
-        <td>{{ link.ssl }}</td>
-        <td id="ping-{{ link.url }}">
-            <div class="ping-container">
-                {% if link.ping != "N/A" %}
-                    <div class="ping-bar" style="width: {{ link.ping|divisibleby:10 }}%;">
-                        <span class="ping-value">{{ link.ping }} ms</span>
-                    </div>
-                {% else %}
-                    <div class="na-text">N/A</div>
-                {% endif %}
+            <ul class="menu">
+                <li class="item"><a href="{% url 'home' %}">Home</a></li>
+                <li class="item"><a href="{% url 'about' %}">About</a></li>
+                <li class="item"><a href="{% url 'faq' %}">FAQ</a></li>
+                <li class="item"><a href="{% url 'upload_excel' %}">Check Excel</a></li>
+                <li class="item"><a href="{% url 'upload_pdf' %}">Check PDF</a></li>
+                <li class="item "><a href="{% url 'upload_csv' %}">Check CSV</a></li>
+            </ul>
+
+            <div class="hamburger">
+                <span></span>
+                <span></span>
+                <span></span>
+                <span></span>
             </div>
-        </td>
-        <td>
-            <button class="visit-button" onclick="confirmVisit('{{ link.url }}')">Перейти</button>
-        </td>
-    </tr>
-    {% endfor %}
-</table>
+        </nav>
+    </div>
+</header>
+<main class="main-content">
+    <body>
+    <h2>Результати перевірки посилань</h2>
 
-<h3>Некоректні посилання:</h3>
-<table>
-    <tr>
-        <th>Посилання</th>
-        <th>SSL сертифікат</th>
-        <th>Пінг</th>
-        <th>Дія</th>
-    </tr>
-    {% for link in incorrect_links %}
-    <tr>
-        <td class="link-url">{{ link.url }}</td>
-        <td>{{ link.ssl }}</td>
-        <td id="ping-{{ link.url }}">
-            <div class="ping-container">
-                {% if link.ping != "N/A" %}
-                    <div class="ping-bar" style="width: {{ link.ping|divisibleby:10 }}%;">
-                        <span class="ping-value">{{ link.ping }} ms</span>
+    <h3>Коректні посилання:</h3>
+    <table>
+        <tr>
+            <th>Посилання</th>
+            <th>SSL сертифікат</th>
+            <th>Пінг</th>
+            <th>Дія</th>
+        </tr>
+        {% for link in correct_links %}
+            <tr>
+                <td class="link-url">{{ link.url }}</td>
+                <td>{{ link.ssl }}</td>
+                <td id="ping-{{ link.url }}">
+                    <div class="ping-container">
+                        {% if link.ping != "N/A" %}
+                            <div class="ping-bar" style="width: {{ link.ping|divisibleby:10 }}%;">
+                                <span class="ping-value">{{ link.ping }} ms</span>
+                            </div>
+                        {% else %}
+                            <div class="na-text">N/A</div>
+                        {% endif %}
                     </div>
-                {% else %}
-                    <div class="na-text">N/A</div>
-                {% endif %}
-            </div>
-        </td>
-        <td>
-            <span class="unavailable-text">Сайт недоступний</span>
-        </td>
-    </tr>
-    {% endfor %}
-</table>
+                </td>
+                <td>
+                    <button class="visit-button" onclick="confirmVisit('{{ link.url }}')">Перейти</button>
+                </td>
+            </tr>
+        {% endfor %}
+    </table>
 
+    <h3>Некоректні посилання:</h3>
+    
+    <table>
+        <tr>
+            <th>Посилання</th>
+            <th>SSL сертифікат</th>
+            <th>Пінг</th>
+            <th>Дія</th>
+        </tr>
+        {% for link in incorrect_links %}
+            <tr>
+                <td class="link-url">{{ link.url }}</td>
+                <td>{{ link.ssl }}</td>
+                <td id="ping-{{ link.url }}">
+                    <div class="ping-container">
+                        {% if link.ping != "N/A" %}
+                            <div class="ping-bar" style="width: {{ link.ping|divisibleby:10 }}%;">
+                                <span class="ping-value">{{ link.ping }} ms</span>
+                            </div>
+                        {% else %}
+                            <div class="na-text">N/A</div>
+                        {% endif %}
+                    </div>
+                </td>
+                <td>
+                    <span class="unavailable-text">Сайт недоступний</span>
+                </td>
+            </tr>
+        {% endfor %}
+    </table>
+
+    </body>
+</main>
+<div class="pad"></div>
+
+
+<script type="module" src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"></script>
+<script nomodule src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"></script>
+<script src="{% static 'js/main.js' %}" async defer></script>
 </body>
 </html>
+
+
